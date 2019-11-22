@@ -1,7 +1,7 @@
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -14,6 +14,15 @@ import static org.hamcrest.core.Is.is;
 public class CreatePetTest {
 
     static long petId;
+
+    public RequestSpecification given() {
+        return RestAssured
+                .given()
+                .baseUri("https://petstore.swagger.io/v2")
+                .log().all()
+                .contentType(ContentType.JSON);
+
+    }
 
     @Test
     public void test1CreatePet() {
@@ -37,21 +46,18 @@ public class CreatePetTest {
                 "  \"status\": \"available\"\n" +
                 "}";
 
-        ValidatableResponse response = RestAssured
-                .given()
+        ValidatableResponse response = given()
                 .body(body)
                 //.header("ContentType", "application/json")
-                .contentType(ContentType.JSON)
-                .log().all()
-                .post("https://petstore.swagger.io/v2/pet")
+                .post(PetEndPoint.CREATE_PET)
                 //.header("Content-Type: application/json")
                 .then()
-                .statusCode(anyOf(is(200),is(201)))
-                .body("category.name", is ("string"))
-                .body("category.name", is (not ("")))
+                .statusCode(anyOf(is(200), is(201)))
+                .body("category.name", is("string"))
+                .body("category.name", is(not("")))
                 .log().all();
 
-        petId =  response.extract().path("id");
+        petId = response.extract().path("id");
         //response.extract().body().jsonPath().getString("id");
         System.out.println(petId);
 
@@ -61,14 +67,11 @@ public class CreatePetTest {
     @Test
     public void test2GetPetById() {
         System.out.println(petId);
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .log().all()
-                .get("https://petstore.swagger.io/v2/pet/"+petId)
+        given()
+                .get(PetEndPoint.GET_PET, petId)
                 .then()
-                .statusCode(anyOf(is(200),is(201)))
-                .body("category.name", is (not ("")))
+                .statusCode(anyOf(is(200), is(201)))
+                .body("category.name", is(not("")))
                 .log().all();
 
     }
@@ -76,13 +79,10 @@ public class CreatePetTest {
     @Test
     public void test3DeletePetById() {
         System.out.println(petId);
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .log().all()
-                .delete("https://petstore.swagger.io/v2/pet/"+petId)
+        given()
+                .delete(PetEndPoint.DELETE_PET,petId)
                 .then()
-                .statusCode(anyOf(is(200),is(201)))
+                .statusCode(anyOf(is(200), is(201)))
                 .log().all();
 
     }
