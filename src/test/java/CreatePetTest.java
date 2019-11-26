@@ -2,6 +2,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -24,8 +25,8 @@ public class CreatePetTest {
 
     }
 
-    @Test
-    public void test1CreatePet() {
+    @Before
+    public void before1CreatePet() {
 
         String body = "{\n" +
                 "  \"id\": 0,\n" +
@@ -63,6 +64,41 @@ public class CreatePetTest {
 
     }
 
+    @Test
+
+    public void test1CreatePet() {
+
+        String body = "{\n" +
+                "  \"id\": 0,\n" +
+                "  \"category\": {\n" +
+                "    \"id\": 0,\n" +
+                "    \"name\": \"string\"\n" +
+                "  },\n" +
+                "  \"name\": \"rat\",\n" +
+                "  \"photoUrls\": [\n" +
+                "    \"string\"\n" +
+                "  ],\n" +
+                "  \"tags\": [\n" +
+                "    {\n" +
+                "      \"id\": 0,\n" +
+                "      \"name\": \"string\"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"status\": \"available\"\n" +
+                "}";
+
+        given()
+
+                 .then()
+                .statusCode(anyOf(is(200), is(201)))
+                .body("category.name", is("string"))
+                .body("category.name", is(not("")))
+                .log().all();
+
+
+
+    }
+
 
     @Test
     public void test2GetPetById() {
@@ -75,6 +111,8 @@ public class CreatePetTest {
                 .log().all();
 
     }
+
+
 
     @Test
     public void test3DeletePetById() {
